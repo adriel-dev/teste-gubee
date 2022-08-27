@@ -1,20 +1,19 @@
 package br.com.gubee.interview.core.features.hero;
 
 import br.com.gubee.interview.model.request.CreateHeroRequest;
+import br.com.gubee.interview.model.response.HeroResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,4 +28,23 @@ public class HeroController {
         final UUID id = heroService.create(createHeroRequest);
         return created(URI.create(format("/api/v1/heroes/%s", id))).build();
     }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<HeroResponse> findHeroById(@PathVariable UUID id) {
+        try{
+            return ok().body(heroService.findHeroById(id));
+        }catch (NoSuchElementException e) {
+            return notFound().build();
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<HeroResponse> findHeroByName(@RequestParam(required = true) String name) {
+        try{
+            return ok().body(heroService.findHeroByName(name));
+        }catch (NoSuchElementException e) {
+            return ok().build();
+        }
+    }
+
 }

@@ -4,10 +4,12 @@ import br.com.gubee.interview.core.features.powerstats.PowerStatsRepository;
 import br.com.gubee.interview.model.Hero;
 import br.com.gubee.interview.model.PowerStats;
 import br.com.gubee.interview.model.request.CreateHeroRequest;
+import br.com.gubee.interview.model.response.HeroResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -23,4 +25,13 @@ public class HeroService {
         final UUID powerStatsId = powerStatsRepository.create(new PowerStats(createHeroRequest));
         return heroRepository.create(new Hero(createHeroRequest, powerStatsId));
     }
+
+    public HeroResponse findHeroById(UUID id) throws NoSuchElementException {
+        return heroRepository.findHeroById(id);
+    }
+
+    public HeroResponse findHeroByName(String name) throws NoSuchElementException {
+        return heroRepository.findHeroByName(name);
+    }
+
 }
