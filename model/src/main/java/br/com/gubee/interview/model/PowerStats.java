@@ -18,10 +18,10 @@ import static lombok.AccessLevel.PRIVATE;
 public class PowerStats {
 
     private UUID id;
-    private int strength;
-    private int agility;
-    private int dexterity;
-    private int intelligence;
+    private Integer strength;
+    private Integer agility;
+    private Integer dexterity;
+    private Integer intelligence;
     private Instant createdAt;
     private Instant updatedAt;
 

@@ -1,6 +1,7 @@
 package br.com.gubee.interview.core.features.hero;
 
 import br.com.gubee.interview.model.request.CreateHeroRequest;
+import br.com.gubee.interview.model.request.UpdateHeroRequest;
 import br.com.gubee.interview.model.response.HeroResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,15 @@ public class HeroController {
             return ok().body(heroService.findHeroByName(name));
         }catch (NoSuchElementException e) {
             return ok().build();
+        }
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<HeroResponse> update(@PathVariable UUID id, @RequestBody UpdateHeroRequest updateHeroRequest) {
+        try {
+            return ok().body(heroService.update(id, updateHeroRequest));
+        }catch (NoSuchElementException e) {
+            return notFound().build();
         }
     }
 

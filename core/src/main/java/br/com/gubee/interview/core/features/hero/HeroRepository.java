@@ -4,13 +4,12 @@ import br.com.gubee.interview.model.Hero;
 import br.com.gubee.interview.model.enums.Race;
 import br.com.gubee.interview.model.response.HeroResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,6 +30,8 @@ public class HeroRepository {
             "FROM hero " +
             "INNER JOIN power_stats ON hero.power_stats_id = power_stats.id " +
             "WHERE hero.name LIKE :heroName";
+
+    private static final String FIND_POWER_STATS_ID = "SELECT hero.power_stats_id FROM hero WHERE hero.id = :heroId";
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -69,6 +70,39 @@ public class HeroRepository {
                 rs.getInt("intelligence")
         ));
         return heroes.stream().findFirst().orElseThrow(NoSuchElementException::new);
+    }
+
+    public UUID update(Hero hero) {
+        try{
+            String query = createUpdateQuery(hero);
+            if(query != null){
+                Map<String, Object> params = createParamsList(hero);
+                return namedParameterJdbcTemplate.queryForObject(query, params, UUID.class);
+            }else{
+                Map<String, Object> params = Map.of("heroId", hero.getId());
+                return namedParameterJdbcTemplate.queryForObject(FIND_POWER_STATS_ID, params, UUID.class);
+            }
+        }catch (EmptyResultDataAccessException e) {
+            throw new NoSuchElementException();
+        }
+    }
+
+    private String createUpdateQuery(Hero hero) {
+        String name = hero.getName() != null ? "name = :name," : "";
+        String race = hero.getRace() != null ? "race = :race," : "";
+        String query = "UPDATE hero " +
+                "SET "+name+race+" updated_at = :updatedAt " +
+                "WHERE id = :id RETURNING power_stats_id";
+        return name.equals("") && race.equals("") ? null : query;
+    }
+
+    private Map<String, Object> createParamsList(Hero hero) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", hero.getId());
+        if(hero.getName() != null) params.put("name", hero.getName());
+        if(hero.getRace() != null) params.put("race", hero.getRace().name());
+        params.put("updatedAt", Timestamp.from(hero.getUpdatedAt()));
+        return params;
     }
 
 }
