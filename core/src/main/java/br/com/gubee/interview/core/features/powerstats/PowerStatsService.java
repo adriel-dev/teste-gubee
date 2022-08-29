@@ -23,4 +23,8 @@ public class PowerStatsService {
         powerStatsRepository.update(powerStats);
     }
 
+    public void delete(UUID id) throws NoSuchElementException {
+        powerStatsRepository.delete(id);
+    }
+
 }

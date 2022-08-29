@@ -33,6 +33,8 @@ public class HeroRepository {
 
     private static final String FIND_POWER_STATS_ID = "SELECT hero.power_stats_id FROM hero WHERE hero.id = :heroId";
 
+    private static final String DELETE_HERO_QUERY = "DELETE FROM hero WHERE hero.id = :id";
+
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     UUID create(Hero hero) {
@@ -72,6 +74,15 @@ public class HeroRepository {
         return heroes.stream().findFirst().orElseThrow(NoSuchElementException::new);
     }
 
+    public UUID findHeroPowerStatsId(UUID id) {
+        Map<String, Object> params = Map.of("heroId", id);
+        try{
+            return namedParameterJdbcTemplate.queryForObject(FIND_POWER_STATS_ID, params, UUID.class);
+        }catch (EmptyResultDataAccessException e) {
+            throw new NoSuchElementException();
+        }
+    }
+
     public UUID update(Hero hero) {
         try{
             String query = createUpdateQuery(hero);
@@ -79,8 +90,7 @@ public class HeroRepository {
                 Map<String, Object> params = createParamsList(hero);
                 return namedParameterJdbcTemplate.queryForObject(query, params, UUID.class);
             }else{
-                Map<String, Object> params = Map.of("heroId", hero.getId());
-                return namedParameterJdbcTemplate.queryForObject(FIND_POWER_STATS_ID, params, UUID.class);
+                return findHeroPowerStatsId(hero.getId());
             }
         }catch (EmptyResultDataAccessException e) {
             throw new NoSuchElementException();
@@ -103,6 +113,12 @@ public class HeroRepository {
         if(hero.getRace() != null) params.put("race", hero.getRace().name());
         params.put("updatedAt", Timestamp.from(hero.getUpdatedAt()));
         return params;
+    }
+
+    public void delete(UUID id) {
+        Map<String, UUID> params = Map.of("id", id);
+        final int rowsAffected = namedParameterJdbcTemplate.update(DELETE_HERO_QUERY, params);
+        if(rowsAffected == 0) throw new NoSuchElementException();
     }
 
 }

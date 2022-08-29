@@ -61,4 +61,11 @@ public class HeroService {
         return this.findHeroById(id);
     }
 
+    @Transactional
+    public void delete(UUID id) throws NoSuchElementException {
+        UUID powerStatsId = heroRepository.findHeroPowerStatsId(id);
+        heroRepository.delete(id);
+        powerStatsRepository.delete(powerStatsId);
+    }
+
 }

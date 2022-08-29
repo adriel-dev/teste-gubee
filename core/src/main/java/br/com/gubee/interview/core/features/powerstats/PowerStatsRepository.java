@@ -21,6 +21,8 @@ public class PowerStatsRepository {
         " (strength, agility, dexterity, intelligence)" +
         " VALUES (:strength, :agility, :dexterity, :intelligence) RETURNING id";
 
+    private static final String DELETE_POWER_STATS_QUERY = "DELETE FROM power_stats WHERE power_stats.id = :id";
+
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public UUID create(PowerStats powerStats) {
@@ -62,6 +64,12 @@ public class PowerStatsRepository {
         if(powerStats.getIntelligence() != null) params.put("intelligence", powerStats.getIntelligence());
         params.put("updatedAt", Timestamp.from(powerStats.getUpdatedAt()));
         return params;
+    }
+
+    public void delete(UUID id) {
+        Map<String, UUID> params = Map.of("id", id);
+        final int rowsAffected = namedParameterJdbcTemplate.update(DELETE_POWER_STATS_QUERY, params);
+        if (rowsAffected == 0) throw new NoSuchElementException();
     }
 
 }

@@ -57,4 +57,14 @@ public class HeroController {
         }
     }
 
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        try {
+            heroService.delete(id);
+            return ok().build();
+        }catch (NoSuchElementException e) {
+            return notFound().build();
+        }
+    }
+
 }
