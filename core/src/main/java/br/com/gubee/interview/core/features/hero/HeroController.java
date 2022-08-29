@@ -2,6 +2,7 @@ package br.com.gubee.interview.core.features.hero;
 
 import br.com.gubee.interview.model.request.CreateHeroRequest;
 import br.com.gubee.interview.model.request.UpdateHeroRequest;
+import br.com.gubee.interview.model.response.CompareHeroesResponse;
 import br.com.gubee.interview.model.response.HeroResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -63,6 +65,15 @@ public class HeroController {
             heroService.delete(id);
             return ok().build();
         }catch (NoSuchElementException e) {
+            return notFound().build();
+        }
+    }
+
+    @GetMapping(value = "/compare/{id1}/{id2}")
+    public ResponseEntity<CompareHeroesResponse> compare(@PathVariable(value = "id1") UUID heroId1, @PathVariable(value = "id2") UUID heroId2) {
+        try {
+            return ok().body(heroService.compare(heroId1, heroId2));
+        } catch (NoSuchElementException e) {
             return notFound().build();
         }
     }

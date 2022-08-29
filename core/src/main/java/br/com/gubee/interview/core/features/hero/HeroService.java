@@ -5,12 +5,14 @@ import br.com.gubee.interview.model.Hero;
 import br.com.gubee.interview.model.PowerStats;
 import br.com.gubee.interview.model.request.CreateHeroRequest;
 import br.com.gubee.interview.model.request.UpdateHeroRequest;
+import br.com.gubee.interview.model.response.CompareHeroesResponse;
 import br.com.gubee.interview.model.response.HeroResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -66,6 +68,20 @@ public class HeroService {
         UUID powerStatsId = heroRepository.findHeroPowerStatsId(id);
         heroRepository.delete(id);
         powerStatsRepository.delete(powerStatsId);
+    }
+
+    public CompareHeroesResponse compare(UUID heroId1, UUID heroId2) throws NoSuchElementException {
+        List<HeroResponse> heroes = heroRepository.compare(heroId1, heroId2);
+        HeroResponse hero1 = heroes.get(0);
+        HeroResponse hero2 = heroes.get(1);
+        return new CompareHeroesResponse(
+                heroId1,
+                heroId2,
+                hero1.getStrength() - hero2.getStrength(),
+                hero1.getAgility() - hero2.getAgility(),
+                hero1.getDexterity() - hero2.getDexterity(),
+                hero1.getIntelligence() - hero2.getIntelligence()
+        );
     }
 
 }

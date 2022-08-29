@@ -2,6 +2,7 @@ package br.com.gubee.interview.core.features.hero;
 
 import br.com.gubee.interview.model.Hero;
 import br.com.gubee.interview.model.enums.Race;
+import br.com.gubee.interview.model.response.CompareHeroesResponse;
 import br.com.gubee.interview.model.response.HeroResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -119,6 +120,12 @@ public class HeroRepository {
         Map<String, UUID> params = Map.of("id", id);
         final int rowsAffected = namedParameterJdbcTemplate.update(DELETE_HERO_QUERY, params);
         if(rowsAffected == 0) throw new NoSuchElementException();
+    }
+
+    public List<HeroResponse> compare(UUID heroId1, UUID heroId2) {
+        HeroResponse hero1 = findHeroById(heroId1);
+        HeroResponse hero2 = findHeroById(heroId2);
+        return List.of(hero1, hero2);
     }
 
 }
