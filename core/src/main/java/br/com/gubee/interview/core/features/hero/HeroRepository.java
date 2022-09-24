@@ -53,15 +53,19 @@ public class HeroRepository {
     }
 
     public List<HeroResponse> findAllHeroes() {
-        return namedParameterJdbcTemplate.query(FIND_ALL_HEROES, (rs, rowNum) -> new HeroResponse(
-                UUID.fromString(rs.getString("id")),
-                rs.getString("name"),
-                Race.valueOf(rs.getString("race")),
-                rs.getInt("strength"),
-                rs.getInt("agility"),
-                rs.getInt("dexterity"),
-                rs.getInt("intelligence")
-        ));
+        try{
+            return namedParameterJdbcTemplate.query(FIND_ALL_HEROES, (rs, rowNum) -> new HeroResponse(
+                    UUID.fromString(rs.getString("id")),
+                    rs.getString("name"),
+                    Race.valueOf(rs.getString("race")),
+                    rs.getInt("strength"),
+                    rs.getInt("agility"),
+                    rs.getInt("dexterity"),
+                    rs.getInt("intelligence")
+            ));
+        } catch (EmptyResultDataAccessException e) {
+            throw new NoSuchElementException();
+        }
     }
 
     public HeroResponse findHeroById(UUID id) {

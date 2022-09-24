@@ -35,7 +35,11 @@ public class HeroController {
 
     @GetMapping(value = "/all")
     public ResponseEntity<List<HeroResponse>> findAllHeroes() {
-        return ok().body(heroService.findAllHeroes());
+        try {
+            return ok().body(heroService.findAllHeroes());
+        } catch (NoSuchElementException e) {
+            return notFound().build();
+        }
     }
 
     @GetMapping(value = "/{id}")
