@@ -2,7 +2,6 @@ package br.com.gubee.interview.core.features.hero;
 
 import br.com.gubee.interview.model.Hero;
 import br.com.gubee.interview.model.enums.Race;
-import br.com.gubee.interview.model.response.CompareHeroesResponse;
 import br.com.gubee.interview.model.response.HeroResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,13 +19,17 @@ public class HeroRepository {
         " (name, race, power_stats_id)" +
         " VALUES (:name, :race, :powerStatsId) RETURNING id";
 
-    private static final String FIND_HERO_BY_ID_QUERY = "SELECT hero.name, hero.race, " +
+    private static final String FIND_ALL_HEROES = "SELECT hero.id, hero.name, hero.race, " +
+            "power_stats.strength, power_stats.agility, power_stats.dexterity, power_stats.intelligence " +
+            "FROM hero " +
+            "INNER JOIN power_stats ON hero.power_stats_id = power_stats.id";
+    private static final String FIND_HERO_BY_ID_QUERY = "SELECT hero.id, hero.name, hero.race, " +
             "power_stats.strength, power_stats.agility, power_stats.dexterity, power_stats.intelligence " +
             "FROM hero " +
             "INNER JOIN power_stats ON hero.power_stats_id = power_stats.id " +
             "WHERE hero.id = :heroId";
 
-    private static final String FIND_HERO_BY_NAME = "SELECT hero.name, hero.race, " +
+    private static final String FIND_HERO_BY_NAME = "SELECT hero.id, hero.name, hero.race, " +
             "power_stats.strength, power_stats.agility, power_stats.dexterity, power_stats.intelligence " +
             "FROM hero " +
             "INNER JOIN power_stats ON hero.power_stats_id = power_stats.id " +
@@ -49,9 +52,22 @@ public class HeroRepository {
             UUID.class);
     }
 
+    public List<HeroResponse> findAllHeroes() {
+        return namedParameterJdbcTemplate.query(FIND_ALL_HEROES, (rs, rowNum) -> new HeroResponse(
+                UUID.fromString(rs.getString("id")),
+                rs.getString("name"),
+                Race.valueOf(rs.getString("race")),
+                rs.getInt("strength"),
+                rs.getInt("agility"),
+                rs.getInt("dexterity"),
+                rs.getInt("intelligence")
+        ));
+    }
+
     public HeroResponse findHeroById(UUID id) {
         final Map<String, Object> params = Map.of("heroId", id);
         List<HeroResponse> heroes = namedParameterJdbcTemplate.query(FIND_HERO_BY_ID_QUERY, params, (rs, rowNum) -> new HeroResponse(
+                UUID.fromString(rs.getString("id")),
                 rs.getString("name"),
                 Race.valueOf(rs.getString("race")),
                 rs.getInt("strength"),
@@ -65,6 +81,7 @@ public class HeroRepository {
     public HeroResponse findHeroByName(String name) {
         final Map<String, Object> params = Map.of("heroName", name);
         List<HeroResponse> heroes = namedParameterJdbcTemplate.query(FIND_HERO_BY_NAME, params, (rs, rowNum) -> new HeroResponse(
+                UUID.fromString(rs.getString("id")),
                 rs.getString("name"),
                 Race.valueOf(rs.getString("race")),
                 rs.getInt("strength"),

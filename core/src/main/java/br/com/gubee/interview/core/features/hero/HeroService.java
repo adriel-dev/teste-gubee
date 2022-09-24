@@ -30,6 +30,10 @@ public class HeroService {
         return heroRepository.create(new Hero(createHeroRequest, powerStatsId));
     }
 
+    public List<HeroResponse> findAllHeroes() {
+        return heroRepository.findAllHeroes();
+    }
+
     public HeroResponse findHeroById(UUID id) throws NoSuchElementException {
         return heroRepository.findHeroById(id);
     }

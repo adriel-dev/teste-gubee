@@ -21,7 +21,7 @@ public class HeroServiceIT {
 
     private CreateHeroRequest createHeroRequest() {
         return CreateHeroRequest.builder()
-            .name("Batman")
+            .name("Teste 2")
             .agility(5)
             .dexterity(8)
             .strength(6)

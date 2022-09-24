@@ -21,6 +21,7 @@ import static org.springframework.http.ResponseEntity.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/heroes", produces = APPLICATION_JSON_VALUE)
+@CrossOrigin
 public class HeroController {
 
     private final HeroService heroService;
@@ -30,6 +31,11 @@ public class HeroController {
                                        @RequestBody CreateHeroRequest createHeroRequest) {
         final UUID id = heroService.create(createHeroRequest);
         return created(URI.create(format("/api/v1/heroes/%s", id))).build();
+    }
+
+    @GetMapping(value = "/all")
+    public ResponseEntity<List<HeroResponse>> findAllHeroes() {
+        return ok().body(heroService.findAllHeroes());
     }
 
     @GetMapping(value = "/{id}")
